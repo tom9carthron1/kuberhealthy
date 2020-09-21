@@ -6,7 +6,6 @@ prometheus:
   enabled: false
   name: "prometheus"
   release: prometheus-operator
-  enableScraping: false
   serviceMonitor: false
   enableAlerting: false
 
@@ -21,6 +20,13 @@ resources:
   limits:
     cpu: 2
     memory: 1Gi
+
+## Only minAvailable or maxUnavailable can be set at the same time.
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+  maxUnavailable:
+
 
 tolerations:
   # change to true to tolerate and deploy to masters
@@ -129,3 +135,4 @@ checkReaper:
     repository: kuberhealthy/check-reaper
     tag: v1.4.0
   nodeSelector: {}
+  # startingDeadlineSeconds:

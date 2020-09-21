@@ -33,6 +33,7 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/Comcast/kuberhealthy/v2/pkg/checks/external"
@@ -44,10 +45,20 @@ import (
 )
 
 // Set dynamicClient that represents the client used to watch and list unstructured khchecks
-var (
-	restConfig, _ = clientcmd.BuildConfigFromFlags("", configPath)
-	dynamicClient, _ = dynamic.NewForConfig(restConfig)
-)
+var restConfig *rest.Config
+var dynamicClient dynamic.Interface
+
+func init() {
+	// init a dynamicClient for kubernetes
+	restConfig, err := clientcmd.BuildConfigFromFlags("", configPath)
+	if err != nil {
+		log.Fatalln("Failed to build kubernetes configuration from configuration flags")
+	}
+	dynamicClient, err = dynamic.NewForConfig(restConfig)
+	if err != nil {
+		log.Fatalln("Failed to create kubernetes dynamic client configuration")
+	}
+}
 
 // Kuberhealthy represents the kuberhealthy server and its checks
 type Kuberhealthy struct {
@@ -574,7 +585,7 @@ func (k *Kuberhealthy) masterStatusWatcher(ctx context.Context) {
 		time.Sleep(time.Second * 5)
 
 		// setup a pod watching client for kuberhealthy pods
-		watcher, err := kubernetesClient.CoreV1().Pods(podNamespace).Watch(metav1.ListOptions{
+		watcher, err := kubernetesClient.CoreV1().Pods(podNamespace).Watch(context.TODO(), metav1.ListOptions{
 			LabelSelector: "app=kuberhealthy",
 		})
 		if err != nil {
@@ -946,7 +957,7 @@ func (k *Kuberhealthy) fetchPodByIP(remoteIP string) (v1.Pod, error) {
 	listOptions := metav1.ListOptions{
 		FieldSelector: "status.podIP==" + remoteIP + ",status.phase==Running",
 	}
-	podList, err := podClient.List(listOptions)
+	podList, err := podClient.List(context.TODO(), listOptions)
 	if err != nil {
 		return pod, errors.New("failed to fetch pod with remote ip " + remoteIP + " with error: " + err.Error())
 	}
@@ -1249,12 +1260,12 @@ func (k *Kuberhealthy) configureInfluxForwarding() {
 func listUnstructuredKHChecks() (*unstructured.UnstructuredList, error) {
 
 	khCheckGroupVersionResource := schema.GroupVersionResource{
-		Version: checkCRDVersion,
+		Version:  checkCRDVersion,
 		Resource: checkCRDResource,
-		Group: checkCRDGroup,
+		Group:    checkCRDGroup,
 	}
 
-	unstructuredList, err := dynamicClient.Resource(khCheckGroupVersionResource).Namespace("").List(metav1.ListOptions{})
+	unstructuredList, err := dynamicClient.Resource(khCheckGroupVersionResource).Namespace("").List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return unstructuredList, err
 	}
@@ -1262,7 +1273,7 @@ func listUnstructuredKHChecks() (*unstructured.UnstructuredList, error) {
 	return unstructuredList, err
 }
 
-func convertUnstructuredKhCheck(unstructured unstructured.Unstructured) (khcheckcrd.KuberhealthyCheck, error){
+func convertUnstructuredKhCheck(unstructured unstructured.Unstructured) (khcheckcrd.KuberhealthyCheck, error) {
 	un := unstructured.UnstructuredContent()
 	var khCheck khcheckcrd.KuberhealthyCheck
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(un, &khCheck)
@@ -1276,12 +1287,12 @@ func convertUnstructuredKhCheck(unstructured unstructured.Unstructured) (khcheck
 func watchUnstructuredKHChecks() (watch.Interface, error) {
 
 	khCheckGroupVersionResource := schema.GroupVersionResource{
-		Version: checkCRDVersion,
+		Version:  checkCRDVersion,
 		Resource: checkCRDResource,
-		Group: checkCRDGroup,
+		Group:    checkCRDGroup,
 	}
 
-	watcher, err := dynamicClient.Resource(khCheckGroupVersionResource).Namespace("").Watch(metav1.ListOptions{})
+	watcher, err := dynamicClient.Resource(khCheckGroupVersionResource).Namespace("").Watch(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return watcher, err
 	}

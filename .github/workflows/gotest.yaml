@@ -1,4 +1,4 @@
-name: Run Gosec
+name: Run gotest
 on:
   push: 
     branches:

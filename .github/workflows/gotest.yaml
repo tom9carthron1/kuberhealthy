@@ -17,4 +17,4 @@ jobs:
       - name: Checkout Source 
         uses: actions/checkout@v2
       - name: Run gotest
-        run: go test ./...
+        run: go test ./... -v -short

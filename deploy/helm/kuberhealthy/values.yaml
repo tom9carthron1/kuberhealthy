@@ -39,6 +39,11 @@ deployment:
   imagePullPolicy: IfNotPresent
   nodeSelector: {}
   podAnnotations: {}
+  # tolerations:
+  # - key: "key"
+  #   operator: "Equal"
+  #   value: "value"
+  #   effect: "NoSchedule"
   env: {}
   command:
   - /app/kuberhealthy
@@ -98,6 +103,16 @@ check:
       tag: v1.4.0
     extraEnvs:
       HOSTNAME: "kubernetes.default"
+    nodeSelector: {}
+  dnsExternal:
+    enabled: false
+    runInterval: 2m
+    timeout: 15m
+    image:
+      repository: kuberhealthy/dns-resolution-check
+      tag: v1.4.0
+    extraEnvs:
+      HOSTNAME: "google.com"
     nodeSelector: {}
   podRestarts:
     enabled: false

@@ -16,6 +16,7 @@ package main
 
 import (
 	"context"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -61,7 +62,15 @@ func init() {
 	// Grab and verify environment variables and set them as global vars
 	Namespace = os.Getenv("POD_NAMESPACE")
 	if len(Namespace) == 0 {
-		log.Errorln("ERROR: The POD_NAMESPACE environment variable has not been set.")
+		log.Errorln("ERROR: The POD_NAMESPACE environment variable has not been set. Attempting to read namespace from secrets.")
+		data, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
+		if err != nil {
+			log.Warnln("Failed to open namespace file:", err.Error())
+		}
+		if len(data) != 0 {
+			log.Infoln("Setting namespace to:", string(data))
+			Namespace = string(data)
+		}
 		return
 	}
 

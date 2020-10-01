@@ -1,5 +1,8 @@
+IMAGE="kuberhealthy/pod-restarts-check"
+TAG="v2.3.1"
+
 build:
-	docker build -t kuberhealthy/pod-restarts-check:v2.3.0 -f Dockerfile ../../
+	docker build -t ${IMAGE}:${TAG} -f Dockerfile ../../
 
 push:
-	docker push kuberhealthy/pod-restarts-check:v2.3.0
+	docker push ${IMAGE}:${TAG}

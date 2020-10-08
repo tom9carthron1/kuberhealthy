@@ -40,7 +40,7 @@ After installation, Kuberhealthy will only be available from within the cluster 
 
 Kuberhealthy is currently tested on Kubernetes `1.9.x`, to `1.18.x`.
 
-More installation options, including static yaml files are available in the [/deploy](/deploy) directory.  To configure Kuberhealthy after installation, see the [configuration documentation](https://github.com/Comcast/kuberhealthy/blob/config-readme/docs/CONFIGURATION.md).
+More installation options, including static yaml files are available in the [/deploy](/deploy) directory.  To configure Kuberhealthy after installation, see the [configuration documentation](https://github.com/Comcast/kuberhealthy/blob/master/docs/CONFIGURATION.md).
 
 
 ### Why Are Synthetic Tests Important?

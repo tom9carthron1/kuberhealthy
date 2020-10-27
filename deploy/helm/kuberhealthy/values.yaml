@@ -60,6 +60,11 @@ securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
 
+# When enabled kuberhealthy will create a PodSecurityPolicy, Role and Binding to match the specified securityContext
+# In case you use your own images for tests, you might need to add other PSPs as well on your own
+podSecurityPolicy:
+  enabled: false
+
 # Please remember that changing the service type to LoadBalancer
 # will expose Kuberhealthy to the internet, which could cause
 # error messages shown by Kuberhealthy to be exposed to the
@@ -79,7 +84,7 @@ check:
     timeout: 12m
     image:
       repository: kuberhealthy/daemonset-check
-      tag: v3.1.0
+      tag: v3.2.1
     extraEnvs:
     nodeSelector: {}
   deployment:
@@ -88,7 +93,7 @@ check:
     timeout: 15m
     image:
       repository: kuberhealthy/deployment-check
-      tag: v1.6.0
+      tag: v1.6.2
     extraEnvs:
       CHECK_DEPLOYMENT_REPLICAS: "4"
       CHECK_DEPLOYMENT_ROLLING_UPDATE: "true"
@@ -100,7 +105,7 @@ check:
     timeout: 15m
     image:
       repository: kuberhealthy/dns-resolution-check
-      tag: v1.4.0
+      tag: v1.4.1
     extraEnvs:
       HOSTNAME: "kubernetes.default"
     nodeSelector: {}
@@ -110,7 +115,7 @@ check:
     timeout: 15m
     image:
       repository: kuberhealthy/dns-resolution-check
-      tag: v1.4.0
+      tag: v1.4.1
     extraEnvs:
       HOSTNAME: "google.com"
     nodeSelector: {}
@@ -120,7 +125,7 @@ check:
     timeout: 10m
     image:
       repository: kuberhealthy/pod-restarts-check
-      tag: v2.3.0
+      tag: v2.3.1
     extraEnvs:
       MAX_FAILURES_ALLOWED: "10"
     nodeSelector: {}
@@ -130,9 +135,10 @@ check:
     timeout: 15m
     image:
       repository: kuberhealthy/pod-status-check
-      tag: v1.2.2
+      tag: v1.2.3
     extraEnvs:
     nodeSelector: {}
+    allNamespaces: false
   networkConnection:
     enabled: false
     runInterval: 30m
@@ -148,6 +154,6 @@ checkReaper:
   enabled: true # Don't disable checkReaper, this flag exist to make e2e tests easier.
   image:
     repository: kuberhealthy/check-reaper
-    tag: v1.4.0
+    tag: v1.5.0
   nodeSelector: {}
   # startingDeadlineSeconds:

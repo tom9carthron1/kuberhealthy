@@ -1,18 +1,28 @@
-1) Improved user-facing website
-1) Improved new user experience and documentation
-1) Versioned Documentation
+Kuberhealthy 2.4
+- Move check reaper into main binary
 
-1) Builds for more versions (arm, whatever)
+Kuberhealthy 2.5
+- Builds for more versions (arm and windows)
+- Improved user-facing website
+- Migrate to custom Kuberhealthy/ org on Github
+- Client packages in different languages for fetching and parsing the JSON status page
 
-1) Migrate to custom Kuberhealthy/ org on Github
-1) Break checks into their own repos with their own build process and release tags
-1) Formal check adoption process for checks that should be core to the project
-1) Extra resources to validate check containers are safe for mass consumption 
+Kuberhealthy 2.6
+- Improved new user experience and documentation
+- Versioned Documentation
+- Break checks into their own repos with their own build process and release tags
 
-1) Client packages in different languages for fetching and parsing the JSON status page
-1) GUI for check statuses (not just json page)
-1) GUI for adding/enabling new checks (Without creating a CRD yourself)
+Kuberhealthy 2.7
+- Improved vulnerability response with security patches for supported versions
+- GUI for check statuses (not just json page)
+- Formal check adoption process for checks that should be core to the project
 
-1) Container integrity checking vs a list of known container hashes
+Kuberhealthy 2.8
+- Document version support policy
+- Extra tests to validate check containers are safe for mass consumption 
+- GUI for adding/enabling new checks (Without creating a CRD yourself)
+- Container integrity checking vs a list of known container hashes
 
-1) Automatic actions based on check results
+Kuberhealthy 3
+- Automatic actions based on check results
+

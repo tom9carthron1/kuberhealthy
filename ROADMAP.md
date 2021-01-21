@@ -4,7 +4,6 @@ Kuberhealthy 2.4
 
 Kuberhealthy 2.5
 - Builds for more versions (arm and windows)
-- Improved user-facing website
 - Migrate to custom Kuberhealthy/ org on Github
 - Client packages in different languages for fetching and parsing the JSON status page
 

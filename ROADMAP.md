@@ -1,5 +1,6 @@
 Kuberhealthy 2.4
 - Move check reaper into main binary
+- New Node Pod Check
 
 Kuberhealthy 2.5
 - Builds for more versions (arm and windows)

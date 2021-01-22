@@ -18,7 +18,13 @@ spec:
     {{- end }}
     containers:
     - name: main
-      image: {{ $.Values.check.storage.image.repository }}:{{ $.Values.check.storage.image.tag }}
+      {{- if .Values.imageRegistry }}
+      image: {{- .Values.imageRegistry }}/{{ .Values.check.storage.image.repository }}:{{ .Values.check.storage.image.tag }}
+      {{- else if .Values.check.storage.image.registry }}
+      image: {{ .Values.check.storage.image.registry }}/{{ .Values.check.storage.image.repository }}:{{ .Values.check.storage.image.tag }}
+      {{- else }}
+      image: {{ .Values.check.storage.image.repository }}:{{ .Values.check.storage.image.tag }}
+      {{- end }}
       imagePullPolicy: IfNotPresent
       env:
 {{- if ne . "" }}
@@ -37,8 +43,17 @@ spec:
 {{- end }}
       resources:
         requests:
-          cpu: 10m
-          memory: 50Mi
+          cpu: {{ .Values.check.storage.resources.requests.cpu }}
+          memory: {{ .Values.check.storage.resources.requests.memory }}
+        {{- if .Values.check.storage.resources.limits }}
+        limits:
+          {{- if .Values.check.storage.resources.limits.cpu }}
+          cpu: {{ .Values.check.storage.resources.limits.cpu }}
+          {{- end }}
+          {{- if .Values.check.storage.resources.limits.memory }}
+          memory: {{ .Values.check.storage.resources.limits.memory }}
+          {{- end }}
+        {{- end }}
         {{- if $.Values.securityContext.enabled }}
         securityContext:
           allowPrivilegeEscalation: {{ $.Values.securityContext.allowPrivilegeEscalation }}
@@ -49,6 +64,10 @@ spec:
     {{- if $.Values.check.storage.nodeSelector }}
     nodeSelector:
 {{- toYaml $.Values.check.storage.nodeSelector | nindent 6 }}
+    {{- end }}
+    {{- if $.Values.check.storage.tolerations }}
+    tolerations:
+{{- toYaml $.Values.check.storage.tolerations | nindent 6 }}
     {{- end }}
 {{- end }}
 ---

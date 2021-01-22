@@ -27,13 +27,28 @@ spec:
           - name: {{ $key }}
             value: {{ $value | quote }}
 {{- end }}
+        {{- if .Values.imageRegistry }}
+        image: {{- .Values.imageRegistry }}/{{ .Values.check.podStatus.image.repository }}:{{ .Values.check.podStatus.image.tag }}
+        {{- else if .Values.check.podStatus.image.registry }}
+        image: {{ .Values.check.podStatus.image.registry }}/{{ .Values.check.podStatus.image.repository }}:{{ .Values.check.podStatus.image.tag }}
+        {{- else }}
         image: {{ .Values.check.podStatus.image.repository }}:{{ .Values.check.podStatus.image.tag }}
+        {{- end }}
         imagePullPolicy: IfNotPresent
         name: main
         resources:
           requests:
-            cpu: 10m
-            memory: 50Mi
+            cpu: {{ .Values.check.podStatus.resources.requests.cpu }}
+            memory: {{ .Values.check.podStatus.resources.requests.memory }}
+          {{- if .Values.check.podStatus.resources.limits }}
+          limits:
+            {{- if .Values.check.podStatus.resources.limits.cpu }}
+            cpu: {{ .Values.check.podStatus.resources.limits.cpu }}
+            {{- end }}
+            {{- if .Values.check.podStatus.resources.limits.memory }}
+            memory: {{ .Values.check.podStatus.resources.limits.memory }}
+            {{- end }}
+          {{- end }}
         {{- if .Values.securityContext.enabled }}
         securityContext:
           allowPrivilegeEscalation: {{ .Values.securityContext.allowPrivilegeEscalation }}
@@ -43,6 +58,10 @@ spec:
     {{- if .Values.check.podStatus.nodeSelector }}
     nodeSelector:
 {{- toYaml .Values.check.podStatus.nodeSelector | nindent 6 }}
+    {{- end }}
+    {{- if .Values.check.podStatus.tolerations }}
+    tolerations:
+{{- toYaml .Values.check.podStatus.tolerations | nindent 6 }}
     {{- end }}
     serviceAccountName: pod-status-sa
 ---

@@ -275,7 +275,7 @@ func waitForPodRemoval(ctx context.Context) error {
 			return errors.New(errorMessage)
 		}
 
-		log.Infoln("DaemonsetChecker using LabelSelector: app=" + daemonSetName + ",source=kuberhealthy,khcheck=daemonset to remove ds pods")
+		log.Infoln("DaemonsetChecker using LabelSelector: kh-app=" + daemonSetName + ",source=kuberhealthy,khcheck=daemonset to remove ds pods")
 
 		// If the delete ticker has ticked, then issue a repeat request for pods to be deleted.
 		// See kuberhealthy issue #74
@@ -349,7 +349,7 @@ func generateDaemonSetSpec() *appsv1.DaemonSet {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: daemonSetName,
 			Labels: map[string]string{
-				"app":              daemonSetName,
+				"kh-app":           daemonSetName,
 				"source":           "kuberhealthy",
 				"khcheck":          "daemonset",
 				"creatingInstance": hostName,
@@ -361,7 +361,7 @@ func generateDaemonSetSpec() *appsv1.DaemonSet {
 			MinReadySeconds: 2,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					"app":              daemonSetName,
+					"kh-app":           daemonSetName,
 					"source":           "kuberhealthy",
 					"khcheck":          "daemonset",
 					"creatingInstance": hostName,
@@ -371,7 +371,7 @@ func generateDaemonSetSpec() *appsv1.DaemonSet {
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						"app":              daemonSetName,
+						"kh-app":           daemonSetName,
 						"source":           "kuberhealthy",
 						"khcheck":          "daemonset",
 						"creatingInstance": hostName,
@@ -409,8 +409,8 @@ func generateDaemonSetSpec() *appsv1.DaemonSet {
 	}
 
 	// Add our generated list of tolerations or any the user input via flag
-	log.Infoln("Deploying daemonset with tolerations: ", daemonSet.Spec.Template.Spec.Tolerations)
 	daemonSet.Spec.Template.Spec.Tolerations = append(daemonSet.Spec.Template.Spec.Tolerations, tolerations...)
+	log.Infoln("Deploying daemonset with tolerations: ", daemonSet.Spec.Template.Spec.Tolerations)
 
 	return daemonSet
 }
@@ -433,6 +433,16 @@ func findAllUniqueTolerations(client *kubernetes.Clientset) ([]apiv1.Toleration,
 	// get a list of all taints
 	for _, n := range nodes.Items {
 		for _, t := range n.Spec.Taints {
+
+			// Don't tolerate any taints listed in ALLOWED_TAINTS
+			// Ignoring cordoned nodes example: node.kubernetes.io/unschedulable:NoSchedule
+			if val, exists := allowedTaints[t.Key]; exists {
+				if val == t.Effect {
+					// Skip tolerating allowed taints
+					continue
+				}
+			}
+
 			// only add unique entries to the slice
 			if _, value := keys[t.Value]; !value {
 				keys[t.Value] = true
@@ -542,6 +552,7 @@ func nodeLabelsMatch(labels, nodeSelectors map[string]string) bool {
 		labelValue, ok := labels[selectorKey]
 		// if there is no matching key, continue to the next node selector
 		if !ok {
+			labelsMatch = false
 			continue
 		}
 		// if there is a matching key, the label's value should match the node selector's value

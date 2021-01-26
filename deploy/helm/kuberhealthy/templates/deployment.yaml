@@ -78,6 +78,14 @@ spec:
           - name: KH_EXTERNAL_REPORTING_URL
             value: {{ .Values.deployment.env.KH_EXTERNAL_REPORTING_URL }}
           {{- end }}
+          {{- if .Values.deployment.env.CHECK_REAPER_MAX_PODS_THRESHOLD }}
+          - name: CHECK_REAPER_MAX_PODS_THRESHOLD
+            value: {{ .Values.deployment.env.CHECK_REAPER_MAX_PODS_THRESHOLD  }}
+          {{- end }}
+          {{- if .Values.deployment.env.CHECK_REAPER_JOB_DELETE_TIME_DURATION }}
+          - name: CHECK_REAPER_JOB_DELETE_TIME_DURATION
+            value: {{ .Values.deployment.env.CHECK_REAPER_JOB_DELETE_TIME_DURATION }}
+          {{- end }}
         readinessProbe:
           failureThreshold: 3
           initialDelaySeconds: 2

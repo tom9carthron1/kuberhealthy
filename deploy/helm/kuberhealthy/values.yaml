@@ -23,8 +23,8 @@ prometheus:
 imageRegistry: {}
 
 image:
-  repository: kuberhealthy/kuberhealthy
-  tag: v2.3.2
+  repository: jdowni000/kuberhealthy
+  tag: dev3
 
 resources:
   requests:
@@ -49,7 +49,7 @@ deployment:
   replicas: 2
   maxSurge: 0
   maxUnavailable: 1
-  imagePullPolicy: IfNotPresent
+  imagePullPolicy: IfNotPresentS
   nodeSelector: {}
   podAnnotations: {}
   # tolerations:
@@ -57,7 +57,10 @@ deployment:
   #   operator: "Equal"
   #   value: "value"
   #   effect: "NoSchedule"
-  env: {}
+  env: {
+    CHECK_REAPER_MAX_PODS_THRESHOLD: "4",
+    CHECK_REAPER_JOB_DELETE_TIME_DURATION: 15m
+  }
   command:
   - /app/kuberhealthy
   # args:
@@ -263,22 +266,22 @@ check:
         memory: 5Mi
         cpu: 10m
 
-checkReaper:
-  enabled: true # Don't disable checkReaper, this flag exist to make e2e tests easier.
-  image:
-    registry: {}
-    repository: kuberhealthy/check-reaper
-    tag: v1.5.1
-  nodeSelector: {}
-  tolerations: []
-    #- key: "key"
-    #  operator: "Equal"
-    #  value: "value"
-    #  effect: "NoSchedule"
-  # startingDeadlineSeconds:
-  maxPodsThreshold: "4"
-  jobDeleteTimeDuration: 15m
-  resources:
-    requests:
-      cpu: 10m
-      memory: 50Mi
+# checkReaper:
+#   enabled: true # Don't disable checkReaper, this flag exist to make e2e tests easier.
+#   image:
+#     registry: {}
+#     repository: kuberhealthy/check-reaper
+#     tag: v1.5.1
+#   nodeSelector: {}
+#   tolerations: []
+#     #- key: "key"
+#     #  operator: "Equal"
+#     #  value: "value"
+#     #  effect: "NoSchedule"
+#   # startingDeadlineSeconds:
+#   maxPodsThreshold: "4"
+#   jobDeleteTimeDuration: 15m
+#   resources:
+#     requests:
+#       cpu: 10m
+#       memory: 50Mi

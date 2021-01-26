@@ -164,6 +164,9 @@ func main() {
 	// tell Kuberhealthy to restart if configmap has been changed
 	go configReloader(kuberhealthy)
 
+	// continuosly run check reaper
+	go checkReaper()
+
 	// tell Kuberhealthy to start all checks and master change monitoring
 	kuberhealthy.Start(khRunCtx)
 
